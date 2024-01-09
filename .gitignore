@@ -1,0 +1,9 @@
+ecosystem-unity/.idea
+ecosystem-unity/UserSettings
+ecosystem-unity/Library
+ecosystem-unity/Logs
+ecosystem-unity/Temp
+ecosystem-unity/obj
+*.csproj
+*.sln
+*DS_Store
