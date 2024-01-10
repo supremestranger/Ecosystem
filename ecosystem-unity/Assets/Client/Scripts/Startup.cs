@@ -22,7 +22,8 @@ namespace Client {
                 MinCameraSize = 1f,
                 MaxCameraSize = 35f,
                 CameraZoomSpeed = 4f,
-                UnitMaxSeeAhead = 1f
+                UnitMaxSeeAhead = 1f,
+                UnitPrefab = Resources.Load<UnitView>("Unit")
             };
 
             Application.targetFrameRate = 60;
@@ -45,16 +46,20 @@ namespace Client {
                 .OneFrame<Seeking>()
                 .OneFrame<Arriving>()
                 .Add(new GoodUnitAiSystem())
+                .Add(new UnitDrinkSystem())
+                .Add(new UnitLookForPartnerSystem())
+                .Add(new UnitReproductionSystem())
+                .Add(new UnitBornSystem())
+                .Add(new UnitFollowSystem())
                 .Add(new UnitWanderSystem())
                 .Add(new UnitSeekSystem())
                 .Add(new UnitArriveSystem())
                 .Add(new UnitCollisionAvoidanceSystem())
                 .Add(new UnitMoveSystem()) // применение стиринга
-                .Add(new UnitReproductionSystem())
+                .OneFrame<LookingForPartner>()
                 .Add(new DayNightSystem())
                 .Add(new TimeControlSystem())
                 .Add(new UnitThirstSystem())
-                .Add(new UnitDrinkSystem())
 
                 .Inject(cs)
                 .Inject(ts)

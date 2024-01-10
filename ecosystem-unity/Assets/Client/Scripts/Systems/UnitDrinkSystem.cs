@@ -11,9 +11,11 @@ namespace Client {
             foreach (var i in _thirstyUnits) {
                 ref var unit = ref _thirstyUnits.Get1(i);
                 ref var thirsty = ref _thirstyUnits.Get2(i);
-
+                
+                ref var a = ref _thirstyUnits.GetEntity(i).Get<Arriving>();
+                a.Target = thirsty.TargetSeaPos;
+                
                 if ((unit.Position - thirsty.TargetSeaPos).sqrMagnitude <= 0.01f) {
-                    _thirstyUnits.GetEntity(i).Get<Busy>();
                     _thirstyUnits.GetEntity(i).Get<Drinking>();
                 }
             }

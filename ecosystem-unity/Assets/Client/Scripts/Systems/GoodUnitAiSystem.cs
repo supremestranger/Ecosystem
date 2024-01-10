@@ -5,19 +5,25 @@ namespace Client {
     sealed class GoodUnitAiSystem : IEcsRunSystem {
         private EcsFilter<Unit>.Exclude<Busy> _units;
         private EnvironmentService _environmentService;
-
+        private TimeService _timeService;
+        private const float ReproductionInterval = 0f;
+        
         public void Run() {
             foreach (var i in _units) {
                 ref var unit = ref _units.Get1(i);
                 if (unit.Thirst <= 20f) {
                     var (sea, rad) = GetClosestSea(unit.Position);
-                    ref var a = ref _units.GetEntity(i).Get<Arriving>();
-                    a.Target = sea;
 
                     ref var thirsty = ref _units.GetEntity(i).Get<Thirsty>();
                     thirsty.TargetSeaPos = sea;
                     thirsty.TargetSeaRadiusSqr = rad * rad;
-                } else {
+                    _units.GetEntity(i).Get<Busy>();
+                }
+                else {
+                    if (_timeService.Time - unit.LastReproductionTime >= ReproductionInterval && unit.Age < 50) {
+                        _units.GetEntity(i).Get<LookingForPartner>();
+
+                    }
                     _units.GetEntity(i).Get<Wandering>();
                 }
             }

@@ -1,42 +1,28 @@
 ﻿using Leopotam.Ecs;
-using UnityEngine;
 
 namespace Client {
     sealed class UnitReproductionSystem : IEcsRunSystem {
-        private EcsFilter<Unit> _units;
+        private EcsFilter<Reproduction>.Exclude<Reproducing> _reproductions;
         private TimeService _timeService;
-        private const float ReproductionInterval = 30f;
-        
+        private EcsWorld _world;
+
         public void Run() {
-            if (_units.GetEntitiesCount() < 2) {
-                return;
-            }
-            
-            EcsEntity unitEntity1 = default;
-            EcsEntity unitEntity2 = default;
-            for (int k = 0; k < 2; k++) {
-                foreach (var i in _units) {
-                    ref var unit = ref _units.Get1(i);
-                    ref var entity = ref _units.GetEntity(i);
+            foreach (var i in _reproductions) {
+                ref var reproduction = ref _reproductions.Get1(i);
 
-                    if (_timeService.Time - unit.LastReproductionTime >= ReproductionInterval && unit.Age < 50) {
-                        if (entity != unitEntity1 && unitEntity1 == default) {
-                            unitEntity1 = entity;
-                            unit.LastReproductionTime = _timeService.Time;
-                            break;
-                        }
+                ref var unit1 = ref reproduction.First.Get<Unit>();
+                ref var unit2 = ref reproduction.Second.Get<Unit>();
+                
 
-                        if (entity != unitEntity2 && unitEntity2 == default) {
-                            unitEntity2 = entity;
-                            unit.LastReproductionTime = _timeService.Time;
-                            break;
-                        }
-                    }
+                if ((unit1.Position - unit2.Position).sqrMagnitude <= 0.01f) {
+                    ref var reproducing = ref _reproductions.GetEntity(i).Get<Reproducing>();
+                    reproduction.First = reproduction.First;
+                    reproduction.Second = reproduction.Second;
+                    reproducing.BornTime = _timeService.Time + 5f;
+                } else {
+                    reproduction.First.Get<Follow>().Target = reproduction.Second;
+                    reproduction.Second.Get<Follow>().Target = reproduction.First;
                 }
-            }
-
-            if (unitEntity1 != default && unitEntity2 != default) {
-                Debug.Log("Hi");
             }
         }
 
